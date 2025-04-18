@@ -1,21 +1,21 @@
 """
-YAML仕様書バリデータ
-====================
-このスクリプトは仕様書YAML（例: spec_sample.yaml）本体の先頭コメントで指定されたバリデータYAML（validator_path）を自動で参照し、
-仕様書が正しい構造・必須項目を満たしているか検証します。
+YAML Specification Validator
+==========================
+This script validates specification YAML files against a validator YAML file that is
+automatically referenced from the validator_path comment in the specification file header.
 
-【使い方】
+Usage:
 $ python validate_spec.py spec_sample.yaml
 
-【主なチェック内容】
-- 各セクションの有無・必須項目の有無
-- 各項目の型（string, list, date など）
-- 不足・過剰な項目の警告
+Validation checks:
+- Presence and requirements of each section
+- Data types (string, list, date, etc.)
+- Warning for missing or excessive items
 
-【依存パッケージ】
+Dependencies:
 - pyyaml
 
-【インストール例】
+Installation:
 $ pip install pyyaml
 """
 import sys
@@ -46,30 +46,44 @@ def check_type(value, expected_type):
             return True
         except Exception:
             return False
-    return True  # 型未定義はスキップ
+    return True  # Skip undefined types
 
 def validate_section(section_rule, doc_dict, errors, parent_path=""):
     section_name = section_rule["name"]
-    path = f"{parent_path}{section_name}"
-    required = section_rule.get("required", False)
-    fields = section_rule.get("fields", [])
-    section = doc_dict.get(section_name)
-    if required and section is None:
-        errors.append(f"必須セクションがありません: {path}")
+    full_path = f"{parent_path}.{section_name}" if parent_path else section_name
+    
+    # Check if required section exists
+    if section_rule.get("required", False) and section_name not in doc_dict:
+        errors.append(f"Required section '{full_path}' is missing")
         return
-    if section is None:
+    
+    # Skip validation if section doesn't exist
+    if section_name not in doc_dict:
         return
-    for field in fields:
-        fname = field["name"]
-        f_required = field.get("required", False)
-        f_type = field.get("type")
-        value = section.get(fname) if isinstance(section, dict) else None
-        fpath = f"{path}.{fname}"
-        if f_required and value is None:
-            errors.append(f"必須項目がありません: {fpath}")
+    
+    # Validate fields in the section
+    for field_rule in section_rule.get("fields", []):
+        field_name = field_rule["name"]
+        field_path = f"{full_path}.{field_name}"
+        
+        # Check if required field exists
+        if field_rule.get("required", False) and (
+            field_name not in doc_dict[section_name]
+        ):
+            errors.append(f"Required field '{field_path}' is missing")
             continue
-        if value is not None and f_type and not check_type(value, f_type):
-            errors.append(f"型不一致: {fpath} (期待: {f_type})")
+        
+        # Skip validation if field doesn't exist
+        if field_name not in doc_dict[section_name]:
+            continue
+        
+        # Validate field type
+        if "type" in field_rule:
+            value = doc_dict[section_name][field_name]
+            if not check_type(value, field_rule["type"]):
+                errors.append(
+                    f"Field '{field_path}' should be of type '{field_rule['type']}'"
+                )
 
 def validate(doc, rules):
     errors = []
@@ -81,21 +95,24 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python validate_spec.py <spec_sample.yaml>")
         sys.exit(1)
+    
     spec_file = sys.argv[1]
     validator_path = extract_validator_path(spec_file)
     if not validator_path:
-        print("[エラー] validator_pathコメントが仕様書先頭にありません。")
+        print("[ERROR] No validator_path comment found at the beginning of the specification.")
         sys.exit(1)
+    
     doc = load_yaml(spec_file)
     rules = load_yaml(validator_path)
     errors = validate(doc, rules)
+    
     if errors:
-        print("[検証NG] 以下の問題があります:")
+        print("[VALIDATION FAILED] The following issues were found:")
         for e in errors:
             print("-", e)
         sys.exit(1)
     else:
-        print("[検証OK] 仕様書は規約に準拠しています。")
+        print("[VALIDATION PASSED] The specification complies with the guidelines.")
 
 if __name__ == "__main__":
     main()
