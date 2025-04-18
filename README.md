@@ -1,51 +1,54 @@
-# yspec - YAML仕様書管理ツール
+# yspec - YAML Specification Management System
 
-YAMLベースの仕様書管理ツールです。仕様書の作成、検証、変換を支援します。
+A comprehensive tool for managing software specifications using YAML-based structured documentation.
 
-## 機能
+## Features
 
-- YAML形式での仕様書作成
-- バリデーションによる仕様書の検証
-- 複数フォーマット（PDF, Word, HTML）への変換サポート
-- Git管理との高い親和性
+- YAML-based specification creation and management
+- Automated validation of specification structure
+- Multiple output format support (PDF, Word, HTML)
+- Git-friendly format for version control
+- Review process support
 
-## 必要要件
+## Requirements
 
-- Python 3.6以上
+- Python 3.6+
 - PyYAML
 
-## インストール
+## Installation
 
 ```bash
 pip install pyyaml
 ```
 
-## 使用方法
+## Quick Start
 
-### 仕様書の作成
-
-1. 仕様書YAMLファイルを作成します
-2. ファイルの先頭に使用するバリデータを指定します：
+1. Review `specification_guidelines.yaml` for system overview and best practices
+2. Create your specification based on `spec_sample.yaml`
+3. Add validator configuration to your spec file:
 ```yaml
 # validator_path: spec_validator.yaml
 ```
-
-### 仕様書の検証
-
+4. Validate your specification:
 ```bash
 python validate_spec.py your_spec.yaml
 ```
 
-バリデータは仕様書ファイル内のコメントから自動的に読み取られます。
+## Repository Structure
 
-## ファイル構成
+- `specification_guidelines.yaml` - Project overview and guidelines
+- `spec_validator.yaml` - Validation rules definition
+- `spec_sample.yaml` - Example specification
+- `validate_spec.py` - Validation script
+- `document_sample.yaml` - Long-form document example
 
-- `仕様書規約.yaml` - 仕様書作成の規約
-- `spec_validator.yaml` - 仕様書のバリデーション定義
-- `spec_sample.yaml` - サンプル仕様書
-- `validate_spec.py` - バリデーションスクリプト
-- `document_sample.yaml` - 長文対応サンプル
+## Getting Started
 
-## ライセンス
+1. Clone the repository
+2. Review `specification_guidelines.yaml` for complete documentation
+3. Follow the examples in `spec_sample.yaml`
+4. Use `validate_spec.py` to verify your specifications
 
-プライベートリポジトリ - All rights reserved
+## License
+
+Private Repository - All rights reserved
