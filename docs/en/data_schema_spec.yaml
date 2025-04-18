@@ -1,0 +1,205 @@
+# Data Schema Specification
+# validator_path: spec_validator.yaml
+---
+document_info:
+  title: "Data Schema Specification v1.0"
+  version: "1.0.0"
+  created_date: "2025-04-18"
+  author: "YASPEC Team"
+
+overview:
+  purpose: "Standardize machine-readable and LLM-friendly data schema definitions"
+  target_users: "Database designers, Application developers"
+  use_cases: "Database design, API development, Migration management"
+
+requirements:
+  functional:
+    - "Clear data type definitions"
+    - "Explicit relationship descriptions"
+    - "Detailed constraint specifications"
+  non_functional:
+    - "Supabase/PostgreSQL compatibility"
+    - "OpenAI Function Calls compatibility"
+    - "Easy automated migration generation"
+  constraints:
+    - "YAML format required"
+    - "UTF-8 encoding"
+
+schema_definition:
+  version: "2025-04"
+  default_fields:
+    created_at: "TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+    updated_at: "TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+    deleted_at: "TIMESTAMP WITH TIME ZONE"
+    
+  data_types:
+    integer_types:
+      - name: "smallint"
+        bits: 16
+        description: "Small range integer"
+        range: "-32768 to 32767"
+      - name: "integer"
+        bits: 32
+        description: "Standard integer"
+        range: "-2147483648 to 2147483647"
+      - name: "bigint"
+        bits: 64
+        description: "Large range integer"
+        range: "-9223372036854775808 to 9223372036854775807"
+    
+    text_types:
+      - name: "char"
+        description: "Fixed-length character string"
+        params: ["length"]
+      - name: "varchar"
+        description: "Variable-length character string"
+        params: ["max_length"]
+      - name: "text"
+        description: "Unlimited length string"
+    
+    date_types:
+      - name: "date"
+        description: "Date only"
+        format: "YYYY-MM-DD"
+      - name: "timestamp"
+        description: "Date and time"
+        format: "YYYY-MM-DD HH:MM:SS"
+        variants:
+          - "with time zone"
+          - "without time zone"
+    
+    special_types:
+      - name: "uuid"
+        description: "UUID v4"
+        default: "gen_random_uuid()"
+      - name: "json"
+        description: "JSON data"
+      - name: "jsonb"
+        description: "Binary JSON data"
+
+  constraints:
+    primary_key:
+      description: "Primary key constraint"
+      properties:
+        - "NOT NULL"
+        - "UNIQUE"
+    
+    foreign_key:
+      description: "Foreign key constraint"
+      properties:
+        reference_table: "Referenced table name"
+        reference_column: "Referenced column name"
+        on_delete: ["CASCADE", "SET NULL", "RESTRICT"]
+        on_update: ["CASCADE", "SET NULL", "RESTRICT"]
+    
+    unique:
+      description: "Uniqueness constraint"
+      variants:
+        - "UNIQUE"
+        - "UNIQUE NULLS NOT DISTINCT"
+    
+    check:
+      description: "Check constraint"
+      examples:
+        - "price >= 0"
+        - "status IN ('active', 'inactive')"
+
+table_examples:
+  users:
+    description: "Table for managing user information"
+    columns:
+      id:
+        type: "uuid"
+        primary_key: true
+        description: "User ID"
+      
+      email:
+        type: "varchar(255)"
+        unique: true
+        not_null: true
+        description: "Email address"
+      
+      name:
+        type: "varchar(100)"
+        not_null: true
+        description: "User name"
+      
+      status:
+        type: "varchar(20)"
+        check: "status IN ('active', 'inactive', 'suspended')"
+        default: "'active'"
+        description: "Account status"
+      
+      metadata:
+        type: "jsonb"
+        description: "Additional metadata"
+      
+      created_at:
+        type: "timestamp with time zone"
+        default: "CURRENT_TIMESTAMP"
+        description: "Creation timestamp"
+    
+    indexes:
+      - name: "users_email_idx"
+        columns: ["email"]
+        unique: true
+      
+      - name: "users_status_idx"
+        columns: ["status"]
+        where: "deleted_at IS NULL"
+    
+    triggers:
+      - name: "set_updated_at"
+        timing: "BEFORE UPDATE"
+        events: ["UPDATE"]
+        function: "trigger_set_updated_at()"
+
+  posts:
+    description: "Table for managing posts"
+    columns:
+      id:
+        type: "uuid"
+        primary_key: true
+        description: "Post ID"
+      
+      user_id:
+        type: "uuid"
+        foreign_key:
+          references: "users(id)"
+          on_delete: "CASCADE"
+        description: "Author ID"
+      
+      title:
+        type: "varchar(200)"
+        not_null: true
+        description: "Post title"
+      
+      content:
+        type: "text"
+        description: "Post content"
+      
+      status:
+        type: "varchar(20)"
+        check: "status IN ('draft', 'published', 'archived')"
+        default: "'draft'"
+        description: "Post status"
+    
+    indexes:
+      - name: "posts_user_id_idx"
+        columns: ["user_id"]
+      
+      - name: "posts_status_created_at_idx"
+        columns: ["status", "created_at DESC"]
+
+generated_artifacts:
+  - "Database migration scripts"
+  - "TypeScript type definitions"
+  - "OpenAPI specifications"
+  - "Data validators"
+  - "Mock data generators"
+
+notes:
+  - "Include created_at, updated_at, deleted_at in all tables"
+  - "deleted_at is for soft deletes (NULL indicates not deleted)"
+  - "Use UUID as primary keys, avoid sequential numbers"
+  - "Use JSONB for flexible extensions, but normalize frequently queried fields"

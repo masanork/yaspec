@@ -1,0 +1,205 @@
+# データスキーマ定義仕様書
+# validator_path: spec_validator.yaml
+---
+ドキュメント情報:
+  タイトル: "データスキーマ定義仕様 v1.0"
+  バージョン: "1.0.0"
+  作成日: "2025-04-18"
+  作成者: "YASPECチーム"
+
+概要:
+  目的: "機械可読でLLMフレンドリーなデータスキーマ定義の標準化"
+  想定ユーザー: "データベース設計者、アプリケーション開発者"
+  利用シーン: "データベース設計、API開発、マイグレーション管理"
+
+要件定義:
+  機能要件:
+    - "データ型の明確な定義"
+    - "リレーションシップの明示的な記述"
+    - "制約条件の詳細な指定"
+  非機能要件:
+    - "Supabase/PostgreSQLとの互換性"
+    - "OpenAI Function Callsとの親和性"
+    - "自動マイグレーション生成の容易さ"
+  制約事項:
+    - "YAML形式での記述"
+    - "UTF-8エンコーディング"
+
+スキーマ定義:
+  バージョン: "2025-04"
+  デフォルト設定:
+    created_at: "TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+    updated_at: "TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP"
+    deleted_at: "TIMESTAMP WITH TIME ZONE"
+    
+  データ型定義:
+    integer_types:
+      - name: "smallint"
+        bits: 16
+        description: "小規模な整数"
+        range: "-32768 to 32767"
+      - name: "integer"
+        bits: 32
+        description: "標準的な整数"
+        range: "-2147483648 to 2147483647"
+      - name: "bigint"
+        bits: 64
+        description: "大規模な整数"
+        range: "-9223372036854775808 to 9223372036854775807"
+    
+    text_types:
+      - name: "char"
+        description: "固定長文字列"
+        params: ["length"]
+      - name: "varchar"
+        description: "可変長文字列"
+        params: ["max_length"]
+      - name: "text"
+        description: "無制限長文字列"
+    
+    date_types:
+      - name: "date"
+        description: "日付のみ"
+        format: "YYYY-MM-DD"
+      - name: "timestamp"
+        description: "日時"
+        format: "YYYY-MM-DD HH:MM:SS"
+        variants:
+          - "with time zone"
+          - "without time zone"
+    
+    special_types:
+      - name: "uuid"
+        description: "UUID v4"
+        default: "gen_random_uuid()"
+      - name: "json"
+        description: "JSON データ"
+      - name: "jsonb"
+        description: "バイナリ JSON データ"
+
+  制約定義:
+    primary_key:
+      description: "主キー制約"
+      properties:
+        - "NOT NULL"
+        - "UNIQUE"
+    
+    foreign_key:
+      description: "外部キー制約"
+      properties:
+        reference_table: "参照先テーブル名"
+        reference_column: "参照先カラム名"
+        on_delete: ["CASCADE", "SET NULL", "RESTRICT"]
+        on_update: ["CASCADE", "SET NULL", "RESTRICT"]
+    
+    unique:
+      description: "一意性制約"
+      variants:
+        - "UNIQUE"
+        - "UNIQUE NULLS NOT DISTINCT"
+    
+    check:
+      description: "チェック制約"
+      examples:
+        - "price >= 0"
+        - "status IN ('active', 'inactive')"
+
+テーブル定義例:
+  users:
+    description: "ユーザー情報を管理するテーブル"
+    columns:
+      id:
+        type: "uuid"
+        primary_key: true
+        description: "ユーザーID"
+      
+      email:
+        type: "varchar(255)"
+        unique: true
+        not_null: true
+        description: "メールアドレス"
+      
+      name:
+        type: "varchar(100)"
+        not_null: true
+        description: "ユーザー名"
+      
+      status:
+        type: "varchar(20)"
+        check: "status IN ('active', 'inactive', 'suspended')"
+        default: "'active'"
+        description: "アカウントステータス"
+      
+      metadata:
+        type: "jsonb"
+        description: "追加のメタデータ"
+      
+      created_at:
+        type: "timestamp with time zone"
+        default: "CURRENT_TIMESTAMP"
+        description: "作成日時"
+    
+    indexes:
+      - name: "users_email_idx"
+        columns: ["email"]
+        unique: true
+      
+      - name: "users_status_idx"
+        columns: ["status"]
+        where: "deleted_at IS NULL"
+    
+    triggers:
+      - name: "set_updated_at"
+        timing: "BEFORE UPDATE"
+        events: ["UPDATE"]
+        function: "trigger_set_updated_at()"
+
+  posts:
+    description: "投稿を管理するテーブル"
+    columns:
+      id:
+        type: "uuid"
+        primary_key: true
+        description: "投稿ID"
+      
+      user_id:
+        type: "uuid"
+        foreign_key:
+          references: "users(id)"
+          on_delete: "CASCADE"
+        description: "投稿者ID"
+      
+      title:
+        type: "varchar(200)"
+        not_null: true
+        description: "投稿タイトル"
+      
+      content:
+        type: "text"
+        description: "投稿内容"
+      
+      status:
+        type: "varchar(20)"
+        check: "status IN ('draft', 'published', 'archived')"
+        default: "'draft'"
+        description: "投稿ステータス"
+    
+    indexes:
+      - name: "posts_user_id_idx"
+        columns: ["user_id"]
+      
+      - name: "posts_status_created_at_idx"
+        columns: ["status", "created_at DESC"]
+
+自動生成物:
+  - "データベースマイグレーションスクリプト"
+  - "TypeScript型定義"
+  - "OpenAPI仕様"
+  - "データバリデータ"
+  - "モックデータジェネレータ"
+
+補足:
+  - "すべてのテーブルにcreated_at, updated_at, deleted_atを含める"
+  - "deleted_atはソフトデリート用（NULLは未削除を示す）"
+  - "UUIDを主キーとして使用し、連番は避ける"
+  - "JSONBは柔軟な拡張を可能にするが、頻繁なクエリ対象は正規化する"
