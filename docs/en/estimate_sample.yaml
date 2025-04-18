@@ -43,9 +43,9 @@ items:
     estimate_id: "e8f7d4c3-b2a1-4f6e-9d8c-5e4b3a2c1f0d"
     item_number: 1
     description: "Requirements Definition & Basic Design"
-    quantity: 1
-    unit: "set"
-    unit_price: 2000000
+    quantity: 20
+    unit: "person-day"
+    unit_price: 100000
     tax_rate: 10.00
     tax_included: false
     discount_type: "none"
@@ -55,9 +55,9 @@ items:
     estimate_id: "e8f7d4c3-b2a1-4f6e-9d8c-5e4b3a2c1f0d"
     item_number: 2
     description: "Detailed Design & Development"
-    quantity: 1
-    unit: "set"
-    unit_price: 5000000
+    quantity: 50
+    unit: "person-day"
+    unit_price: 100000
     tax_rate: 10.00
     tax_included: false
     discount_type: "none"
@@ -67,9 +67,9 @@ items:
     estimate_id: "e8f7d4c3-b2a1-4f6e-9d8c-5e4b3a2c1f0d"
     item_number: 3
     description: "Testing & Implementation Support"
-    quantity: 1
-    unit: "set"
-    unit_price: 3000000
+    quantity: 30
+    unit: "person-day"
+    unit_price: 100000
     tax_rate: 10.00
     tax_included: false
     discount_type: "percentage"
