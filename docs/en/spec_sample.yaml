@@ -1,0 +1,62 @@
+# Specification Sample (YAML Format)
+# validator_path: spec_validator.yaml
+---
+document_info:
+  title: "Sample System Specification"
+  version: "1.0.0"
+  created_date: "2025-04-18"
+  updated_date: "2025-04-18"
+  author: "John Smith"
+
+overview:
+  purpose: "This system aims to automate internal business operations."
+  target_users: "General employees"
+  use_cases: "Daily operations efficiency improvement"
+
+terminology:
+  terms:
+    - API: "Abbreviation for Application Programming Interface"
+    - LLM: "Large Language Model"
+
+requirements:
+  functional:
+    - User registration
+    - Login
+    - Data search
+  non_functional:
+    - Response time within 1 second
+    - SSL communication required
+  constraints:
+    - No external network connection allowed
+
+ui_design:
+  flow_diagram: "img/flow.png"
+  screens:
+    - Login screen
+    - Main screen
+
+api_specification:
+  endpoints:
+    - GET /api/users
+    - POST /api/login
+  parameters:
+    - /api/login: { user_id: string, password: string }
+  response_examples:
+    - /api/users: [{ id: 1, name: "Smith" }]
+  error_cases:
+    - /api/login: "Returns 401 on authentication failure"
+
+data_design:
+  model_diagram: "img/er.png"
+  tables:
+    - users_table: { id: int, name: string }
+
+operations:
+  monitoring: "Output info and error level logs"
+  error_handling: "Email notification to admin on system failure"
+  backup: "Automatic backup daily at midnight"
+
+change_history:
+  - version: "1.0.0"
+    date: "2025-04-18"
+    changes: "Initial version"
