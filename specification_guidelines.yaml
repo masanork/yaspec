@@ -25,6 +25,22 @@ project_overview:
       - "Review process support"
       - "Comment management"
 
+overview:
+  purpose: "Provide guidelines for using YASPEC"
+  target_users: "Software development teams"
+  use_cases: "Software specification management"
+
+requirements:
+  functional:
+    - YAML-based specification creation
+    - Automated validation
+    - Multiple output formats
+  non_functional:
+    - Git-friendly format
+    - Easy to learn and use
+  constraints:
+    - Must follow YAML syntax
+
 repository_structure:
   core_files:
     validate_spec.py: "Main validation script"

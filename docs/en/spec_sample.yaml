@@ -43,6 +43,9 @@ api_specification:
     - /api/login: { user_id: string, password: string }
   response_examples:
     - /api/users: [{ id: 1, name: "Smith" }]
+  responses:
+    - /api/users: { "200": "List of users", "404": "Not found" }
+    - /api/login: { "200": "Login success", "401": "Authentication failed" }
   error_cases:
     - /api/login: "Returns 401 on authentication failure"
 
@@ -52,9 +55,15 @@ data_design:
     - users_table: { id: int, name: string }
 
 operations:
-  monitoring: "Output info and error level logs"
+  monitoring:
+    - "Output info level logs"
+    - "Output error level logs"
+    - "Monitor system resources"
   error_handling: "Email notification to admin on system failure"
-  backup: "Automatic backup daily at midnight"
+  backup:
+    - "Daily automatic backup at midnight"
+    - "Weekly full backup"
+    - "Monthly archive"
 
 change_history:
   - version: "1.0.0"
