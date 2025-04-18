@@ -1,4 +1,4 @@
-# yspec - YAML Specification Management System
+# YASPEC - YAML Automated Specification System
 
 A comprehensive tool for managing software specifications using YAML-based structured documentation.
 

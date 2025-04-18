@@ -1,12 +1,12 @@
-# YSPEC Project Guidelines
+# YASPEC Project Guidelines
 # validator_path: spec_validator.yaml
 ---
 document_info:
-  title: "YSPEC - YAML Specification Management System Guidelines"
+  title: "YASPEC - YAML Automated Specification System Guidelines"
   version: "1.0.0"
   created_date: "2025-04-18"
   updated_date: "2025-04-18"
-  author: "YSPEC Development Team"
+  author: "YASPEC Development Team"
 
 project_overview:
   mission: "Streamline software specification management using YAML-based structured documentation"
