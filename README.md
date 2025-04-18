@@ -22,11 +22,21 @@ pip install pyyaml
 
 ## 使用方法
 
+### 仕様書の作成
+
+1. 仕様書YAMLファイルを作成します
+2. ファイルの先頭に使用するバリデータを指定します：
+```yaml
+# validator_path: spec_validator.yaml
+```
+
 ### 仕様書の検証
 
 ```bash
-python validate_spec.py spec_sample.yaml
+python validate_spec.py your_spec.yaml
 ```
+
+バリデータは仕様書ファイル内のコメントから自動的に読み取られます。
 
 ## ファイル構成
 
