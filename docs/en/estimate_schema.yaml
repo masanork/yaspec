@@ -1,0 +1,287 @@
+# Estimate Data Schema Definition
+# validator_path: spec_validator.yaml
+---
+document_info:
+  title: "Estimate Data Schema v1.0"
+  version: "1.0.0"
+  created_date: "2025-04-18"
+  author: "YASPEC Team"
+
+overview:
+  purpose: "Standardize and manage estimate data"
+  target_users: "Sales representatives, Accounting staff"
+  use_cases: "Estimate creation, Invoice conversion, Cost management"
+
+requirements:
+  functional:
+    - "Create and manage estimates"
+    - "Convert to invoices"
+    - "Version control and history"
+  non_functional:
+    - "Tax calculation accuracy"
+    - "Multi-currency support"
+    - "PDF export"
+  constraints:
+    - "Amounts up to 2 decimal places"
+    - "Tax rates comply with local regulations"
+
+table_definitions:
+  estimates:
+    description: "Basic estimate information"
+    columns:
+      id:
+        type: "uuid"
+        primary_key: true
+        description: "Estimate ID"
+      
+      estimate_number:
+        type: "varchar(20)"
+        unique: true
+        not_null: true
+        description: "Estimate number"
+      
+      version:
+        type: "integer"
+        not_null: true
+        default: 1
+        description: "Version number"
+      
+      issue_date:
+        type: "date"
+        not_null: true
+        description: "Issue date"
+      
+      valid_until:
+        type: "date"
+        not_null: true
+        description: "Valid until date"
+      
+      status:
+        type: "varchar(20)"
+        check: "status IN ('draft', 'issued', 'accepted', 'rejected', 'expired')"
+        default: "'draft'"
+        description: "Status"
+      
+      currency:
+        type: "varchar(3)"
+        not_null: true
+        default: "'JPY'"
+        description: "Currency code (ISO 4217)"
+      
+      exchange_rate:
+        type: "decimal(10,5)"
+        description: "Exchange rate (to JPY)"
+      
+      subject:
+        type: "varchar(200)"
+        not_null: true
+        description: "Subject"
+      
+      notes:
+        type: "text"
+        description: "Notes"
+      
+      payment_terms:
+        type: "varchar(500)"
+        description: "Payment terms"
+      
+      delivery_terms:
+        type: "varchar(500)"
+        description: "Delivery terms"
+
+  estimate_parties:
+    description: "Estimate party information"
+    columns:
+      id:
+        type: "uuid"
+        primary_key: true
+        description: "Party ID"
+      
+      estimate_id:
+        type: "uuid"
+        foreign_key:
+          references: "estimates(id)"
+          on_delete: "CASCADE"
+        description: "Estimate ID"
+      
+      role:
+        type: "varchar(20)"
+        check: "role IN ('issuer', 'client', 'delivery', 'billing')"
+        not_null: true
+        description: "Role"
+      
+      company_name:
+        type: "varchar(100)"
+        not_null: true
+        description: "Company name"
+      
+      department:
+        type: "varchar(100)"
+        description: "Department"
+      
+      contact_name:
+        type: "varchar(100)"
+        description: "Contact person"
+      
+      postal_code:
+        type: "varchar(20)"
+        description: "Postal code"
+      
+      address:
+        type: "varchar(500)"
+        description: "Address"
+      
+      phone:
+        type: "varchar(20)"
+        description: "Phone number"
+      
+      email:
+        type: "varchar(255)"
+        description: "Email address"
+      
+      tax_id:
+        type: "varchar(50)"
+        description: "Tax ID"
+
+  estimate_items:
+    description: "Estimate line items"
+    columns:
+      id:
+        type: "uuid"
+        primary_key: true
+        description: "Item ID"
+      
+      estimate_id:
+        type: "uuid"
+        foreign_key:
+          references: "estimates(id)"
+          on_delete: "CASCADE"
+        not_null: true
+        description: "Estimate ID"
+      
+      item_number:
+        type: "integer"
+        not_null: true
+        description: "Item number"
+      
+      description:
+        type: "varchar(500)"
+        not_null: true
+        description: "Item description"
+      
+      quantity:
+        type: "decimal(10,2)"
+        not_null: true
+        description: "Quantity"
+      
+      unit:
+        type: "varchar(20)"
+        description: "Unit"
+      
+      unit_price:
+        type: "decimal(12,2)"
+        not_null: true
+        description: "Unit price"
+      
+      tax_rate:
+        type: "decimal(5,2)"
+        not_null: true
+        default: "10.00"
+        description: "Tax rate (%)"
+      
+      tax_included:
+        type: "boolean"
+        not_null: true
+        default: false
+        description: "Tax included flag"
+      
+      discount_type:
+        type: "varchar(10)"
+        check: "discount_type IN ('none', 'percentage', 'amount')"
+        default: "'none'"
+        description: "Discount type"
+      
+      discount_value:
+        type: "decimal(12,2)"
+        default: "0"
+        description: "Discount amount or percentage"
+
+  estimate_totals:
+    description: "Estimate total amounts"
+    columns:
+      id:
+        type: "uuid"
+        primary_key: true
+        description: "Totals ID"
+      
+      estimate_id:
+        type: "uuid"
+        foreign_key:
+          references: "estimates(id)"
+          on_delete: "CASCADE"
+        unique: true
+        not_null: true
+        description: "Estimate ID"
+      
+      subtotal:
+        type: "decimal(12,2)"
+        not_null: true
+        description: "Subtotal"
+      
+      total_discount:
+        type: "decimal(12,2)"
+        not_null: true
+        default: "0"
+        description: "Total discount"
+      
+      total_tax:
+        type: "decimal(12,2)"
+        not_null: true
+        description: "Total tax"
+      
+      total_amount:
+        type: "decimal(12,2)"
+        not_null: true
+        description: "Total amount"
+
+indexes:
+  - name: "idx_estimates_number"
+    table: "estimates"
+    columns: ["estimate_number"]
+    unique: true
+  
+  - name: "idx_estimates_issue_date"
+    table: "estimates"
+    columns: ["issue_date"]
+  
+  - name: "idx_estimate_items_estimate_id"
+    table: "estimate_items"
+    columns: ["estimate_id", "item_number"]
+
+triggers:
+  - name: "trg_update_estimate_totals"
+    table: "estimate_items"
+    timing: "AFTER INSERT OR UPDATE OR DELETE"
+    description: "Recalculate totals when items change"
+  
+  - name: "trg_update_estimate_version"
+    table: "estimates"
+    timing: "BEFORE UPDATE"
+    description: "Increment version number on update"
+
+views:
+  estimate_summary:
+    description: "Estimate summary view"
+    columns:
+      - "estimate_number"
+      - "issue_date"
+      - "client_name"
+      - "subject"
+      - "total_amount"
+      - "status"
+
+notes:
+  - "All amounts are stored without tax, calculated on display"
+  - "Exchange rates are stored at the time of estimate"
+  - "Discounts can be applied to individual items or total"
+  - "Version control enables change tracking"

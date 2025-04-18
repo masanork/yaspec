@@ -1,0 +1,287 @@
+# 見積書データスキーマ定義
+# validator_path: spec_validator.yaml
+---
+ドキュメント情報:
+  タイトル: "見積書データスキーマ v1.0"
+  バージョン: "1.0.0"
+  作成日: "2025-04-18"
+  作成者: "YASPECチーム"
+
+概要:
+  目的: "見積書データの標準化と管理"
+  想定ユーザー: "営業担当者、経理担当者"
+  利用シーン: "見積作成、請求書変換、原価管理"
+
+要件定義:
+  機能要件:
+    - "見積書の作成と管理"
+    - "請求書への変換"
+    - "履歴管理と版数管理"
+  非機能要件:
+    - "消費税計算の正確性"
+    - "複数通貨対応"
+    - "PDFエクスポート"
+  制約事項:
+    - "金額は小数点2桁まで"
+    - "税率は現地法令に準拠"
+
+テーブル定義:
+  estimates:
+    description: "見積書基本情報"
+    columns:
+      id:
+        type: "uuid"
+        primary_key: true
+        description: "見積書ID"
+      
+      estimate_number:
+        type: "varchar(20)"
+        unique: true
+        not_null: true
+        description: "見積番号"
+      
+      version:
+        type: "integer"
+        not_null: true
+        default: 1
+        description: "版数"
+      
+      issue_date:
+        type: "date"
+        not_null: true
+        description: "発行日"
+      
+      valid_until:
+        type: "date"
+        not_null: true
+        description: "有効期限"
+      
+      status:
+        type: "varchar(20)"
+        check: "status IN ('draft', 'issued', 'accepted', 'rejected', 'expired')"
+        default: "'draft'"
+        description: "ステータス"
+      
+      currency:
+        type: "varchar(3)"
+        not_null: true
+        default: "'JPY'"
+        description: "通貨コード (ISO 4217)"
+      
+      exchange_rate:
+        type: "decimal(10,5)"
+        description: "為替レート（対円）"
+      
+      subject:
+        type: "varchar(200)"
+        not_null: true
+        description: "件名"
+      
+      notes:
+        type: "text"
+        description: "備考"
+      
+      payment_terms:
+        type: "varchar(500)"
+        description: "支払条件"
+      
+      delivery_terms:
+        type: "varchar(500)"
+        description: "納品条件"
+
+  estimate_parties:
+    description: "見積関係者情報"
+    columns:
+      id:
+        type: "uuid"
+        primary_key: true
+        description: "関係者ID"
+      
+      estimate_id:
+        type: "uuid"
+        foreign_key:
+          references: "estimates(id)"
+          on_delete: "CASCADE"
+        description: "見積書ID"
+      
+      role:
+        type: "varchar(20)"
+        check: "role IN ('issuer', 'client', 'delivery', 'billing')"
+        not_null: true
+        description: "役割"
+      
+      company_name:
+        type: "varchar(100)"
+        not_null: true
+        description: "会社名"
+      
+      department:
+        type: "varchar(100)"
+        description: "部署名"
+      
+      contact_name:
+        type: "varchar(100)"
+        description: "担当者名"
+      
+      postal_code:
+        type: "varchar(20)"
+        description: "郵便番号"
+      
+      address:
+        type: "varchar(500)"
+        description: "住所"
+      
+      phone:
+        type: "varchar(20)"
+        description: "電話番号"
+      
+      email:
+        type: "varchar(255)"
+        description: "メールアドレス"
+      
+      tax_id:
+        type: "varchar(50)"
+        description: "税務番号"
+
+  estimate_items:
+    description: "見積明細"
+    columns:
+      id:
+        type: "uuid"
+        primary_key: true
+        description: "明細ID"
+      
+      estimate_id:
+        type: "uuid"
+        foreign_key:
+          references: "estimates(id)"
+          on_delete: "CASCADE"
+        not_null: true
+        description: "見積書ID"
+      
+      item_number:
+        type: "integer"
+        not_null: true
+        description: "項番"
+      
+      description:
+        type: "varchar(500)"
+        not_null: true
+        description: "品名・説明"
+      
+      quantity:
+        type: "decimal(10,2)"
+        not_null: true
+        description: "数量"
+      
+      unit:
+        type: "varchar(20)"
+        description: "単位"
+      
+      unit_price:
+        type: "decimal(12,2)"
+        not_null: true
+        description: "単価"
+      
+      tax_rate:
+        type: "decimal(5,2)"
+        not_null: true
+        default: "10.00"
+        description: "税率（%）"
+      
+      tax_included:
+        type: "boolean"
+        not_null: true
+        default: false
+        description: "税込価格フラグ"
+      
+      discount_type:
+        type: "varchar(10)"
+        check: "discount_type IN ('none', 'percentage', 'amount')"
+        default: "'none'"
+        description: "値引種別"
+      
+      discount_value:
+        type: "decimal(12,2)"
+        default: "0"
+        description: "値引額または率"
+
+  estimate_totals:
+    description: "見積金額集計"
+    columns:
+      id:
+        type: "uuid"
+        primary_key: true
+        description: "集計ID"
+      
+      estimate_id:
+        type: "uuid"
+        foreign_key:
+          references: "estimates(id)"
+          on_delete: "CASCADE"
+        unique: true
+        not_null: true
+        description: "見積書ID"
+      
+      subtotal:
+        type: "decimal(12,2)"
+        not_null: true
+        description: "小計"
+      
+      total_discount:
+        type: "decimal(12,2)"
+        not_null: true
+        default: "0"
+        description: "値引合計"
+      
+      total_tax:
+        type: "decimal(12,2)"
+        not_null: true
+        description: "消費税合計"
+      
+      total_amount:
+        type: "decimal(12,2)"
+        not_null: true
+        description: "合計金額"
+
+インデックス:
+  - name: "idx_estimates_number"
+    table: "estimates"
+    columns: ["estimate_number"]
+    unique: true
+  
+  - name: "idx_estimates_issue_date"
+    table: "estimates"
+    columns: ["issue_date"]
+  
+  - name: "idx_estimate_items_estimate_id"
+    table: "estimate_items"
+    columns: ["estimate_id", "item_number"]
+
+トリガー:
+  - name: "trg_update_estimate_totals"
+    table: "estimate_items"
+    timing: "AFTER INSERT OR UPDATE OR DELETE"
+    description: "明細更新時に合計を再計算"
+  
+  - name: "trg_update_estimate_version"
+    table: "estimates"
+    timing: "BEFORE UPDATE"
+    description: "更新時に版数をインクリメント"
+
+ビュー:
+  estimate_summary:
+    description: "見積概要ビュー"
+    columns:
+      - "見積番号"
+      - "発行日"
+      - "取引先名"
+      - "件名"
+      - "合計金額"
+      - "ステータス"
+
+注意事項:
+  - "金額は全て税抜きで保存し、表示時に計算する"
+  - "為替レートは見積時点のレートを保存"
+  - "値引きは明細単位と全体の両方に対応"
+  - "版数管理により変更履歴を追跡可能"
