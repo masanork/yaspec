@@ -9,6 +9,7 @@ A comprehensive tool for managing software specifications using YAML-based struc
 - Multiple output format support (PDF, Word, HTML)
 - Git-friendly format for version control
 - Review process support
+- Multilingual support (English/Japanese)
 
 ## Requirements
 
@@ -24,30 +25,40 @@ pip install pyyaml
 ## Quick Start
 
 1. Review `specification_guidelines.yaml` for system overview and best practices
-2. Create your specification based on `spec_sample.yaml`
-3. Add validator configuration to your spec file:
+2. Choose your language directory (`docs/en/` or `docs/ja/`)
+3. Create your specification based on `docs/<lang>/spec_sample.yaml`
+4. Add validator configuration to your spec file:
 ```yaml
 # validator_path: spec_validator.yaml
 ```
-4. Validate your specification:
+5. Validate your specification:
 ```bash
-python validate_spec.py your_spec.yaml
+python validate_spec.py docs/<lang>/your_spec.yaml
 ```
 
 ## Repository Structure
 
-- `specification_guidelines.yaml` - Project overview and guidelines
-- `spec_validator.yaml` - Validation rules definition
-- `spec_sample.yaml` - Example specification
-- `validate_spec.py` - Validation script
-- `document_sample.yaml` - Long-form document example
+```
+yaspec/
+├── docs/
+│   ├── en/                     # English documentation
+│   │   ├── document_sample.yaml
+│   │   └── spec_validator.yaml
+│   └── ja/                     # Japanese documentation
+│       ├── document_sample.yaml
+│       └── spec_validator.yaml
+├── specification_guidelines.yaml
+├── validate_spec.py
+└── README.md
+```
 
 ## Getting Started
 
 1. Clone the repository
-2. Review `specification_guidelines.yaml` for complete documentation
-3. Follow the examples in `spec_sample.yaml`
-4. Use `validate_spec.py` to verify your specifications
+2. Choose your preferred language directory (en/ja)
+3. Review the document_sample.yaml in your language
+4. Create your specification following the examples
+5. Use validate_spec.py to verify your specifications
 
 ## License
 

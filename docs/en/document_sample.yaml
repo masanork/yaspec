@@ -1,0 +1,90 @@
+# Document Sample with Long-form Content
+---
+document_info:
+  title: "Long-form Content Support Guide"
+  version: "1.0.0"
+  created_date: "2025-04-18"
+
+overview: |
+  This document explains the long-form content support features in YAML.
+  While YAML is a structured data format, it can also handle long-form text effectively.
+  Below, we demonstrate specific methods and usage examples.
+
+writing_long_content:
+  basic_syntax: |
+    In YAML, you can use the '|' (pipe) symbol to write multi-line text
+    while preserving line breaks exactly as written.
+    Indentation is preserved, and line breaks at the end of each line are maintained.
+
+  folded_syntax: >
+    When you use the '>' (greater than) symbol, multi-line text will be
+    folded into a single line. Empty lines are used to separate paragraphs.
+    This is useful when writing long content.
+
+    As shown here, an empty line creates a new paragraph.
+
+markup_usage:
+  markdown_syntax: |
+    You can use **Markdown syntax** within YAML.
+    
+    - List item 1
+    - List item 2
+    
+    ### Subheading
+    
+    1. Numbered list
+    2. Second item
+    
+    ```python
+    def example():
+        print("Code blocks are supported")
+    ```
+
+table_examples:
+  table_syntax: |
+    | Item | Description |
+    |------|-------------|
+    | YAML | Data structure definition language |
+    | Markdown | Lightweight markup language |
+    | PDF | Printable document format |
+
+style_settings:
+  pdf:
+    fonts:
+      body: "Helvetica"
+      headings: "Arial"
+    margins:
+      top: "25mm"
+      bottom: "25mm"
+      left: "20mm"
+      right: "20mm"
+    
+  word:
+    styles:
+      body:
+        font: "Calibri"
+        size: "11pt"
+      heading1:
+        font: "Arial"
+        size: "16pt"
+      heading2:
+        font: "Arial"
+        size: "14pt"
+
+conversion_steps: |
+  1. Parse YAML into intermediate format
+  2. Convert to target format using pandoc
+  3. Apply post-processing if needed
+  
+  ```bash
+  # PDF conversion example
+  yaml2md document.yaml | pandoc -f markdown -t pdf --template=template.tex -o output.pdf
+  
+  # Word conversion example
+  yaml2md document.yaml | pandoc -f markdown -t docx --reference-doc=template.docx -o output.docx
+  ```
+
+notes: |
+  - YAML structure allows for both data and documentation
+  - Convert to multiple output formats from the same source
+  - Version control friendly with easy diff tracking

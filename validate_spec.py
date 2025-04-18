@@ -5,18 +5,11 @@ This script validates specification YAML files against a validator YAML file tha
 automatically referenced from the validator_path comment in the specification file header.
 
 Usage:
-$ python validate_spec.py spec_sample.yaml
+$ python validate_spec.py spec_sample.yaml [language]
 
-Validation checks:
-- Presence and requirements of each section
-- Data types (string, list, date, etc.)
-- Warning for missing or excessive items
+language: Optional parameter to specify the language (en/ja). 
+         If not specified, it will be detected from the file path.
 
-Dependencies:
-- pyyaml
-
-Installation:
-$ pip install pyyaml
 """
 import sys
 import yaml
@@ -91,9 +84,26 @@ def validate(doc, rules):
         validate_section(section_rule, doc, errors)
     return errors
 
+def get_language_from_path(file_path):
+    """Detect language from file path (en/ja)"""
+    if "/ja/" in file_path:
+        return "ja"
+    if "/en/" in file_path:
+        return "en"
+    return "en"  # Default to English
+
+def resolve_validator_path(validator_path, spec_file):
+    """Resolve validator path based on language"""
+    if "/" in validator_path:  # If path contains directory, use as is
+        return validator_path
+    
+    # Get language from spec file path
+    lang = get_language_from_path(spec_file)
+    return f"docs/{lang}/{validator_path}"
+
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python validate_spec.py <spec_sample.yaml>")
+        print("Usage: python validate_spec.py <spec_file.yaml> [language]")
         sys.exit(1)
     
     spec_file = sys.argv[1]
@@ -101,6 +111,9 @@ def main():
     if not validator_path:
         print("[ERROR] No validator_path comment found at the beginning of the specification.")
         sys.exit(1)
+    
+    # Resolve validator path based on language
+    validator_path = resolve_validator_path(validator_path, spec_file)
     
     doc = load_yaml(spec_file)
     rules = load_yaml(validator_path)
