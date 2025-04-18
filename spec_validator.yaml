@@ -1,0 +1,101 @@
+# 仕様書規約バリデータ（YAML形式）
+sections:
+  - name: ドキュメント情報
+    required: true
+    fields:
+      - name: タイトル
+        required: true
+        type: string
+      - name: バージョン
+        required: true
+        type: string
+      - name: 作成日
+        required: true
+        type: date
+      - name: 更新日
+        required: false
+        type: date
+      - name: 作成者
+        required: true
+        type: string
+  - name: 概要
+    required: true
+    fields:
+      - name: 目的
+        required: true
+        type: string
+      - name: 想定ユーザー
+        required: false
+        type: string
+      - name: 利用シーン
+        required: false
+        type: string
+  - name: 用語定義
+    required: false
+    fields:
+      - name: 用語一覧
+        required: false
+        type: list
+  - name: 要件定義
+    required: true
+    fields:
+      - name: 機能要件
+        required: true
+        type: list
+      - name: 非機能要件
+        required: false
+        type: list
+      - name: 制約事項
+        required: false
+        type: list
+  - name: 画面・UI設計
+    required: false
+    fields:
+      - name: 画面遷移図
+        required: false
+        type: string
+      - name: 画面一覧
+        required: false
+        type: list
+  - name: API仕様
+    required: false
+    fields:
+      - name: エンドポイント
+        required: false
+        type: list
+      - name: パラメータ
+        required: false
+        type: list
+      - name: レスポンス例
+        required: false
+        type: list
+      - name: エラーケース
+        required: false
+        type: list
+  - name: データ設計
+    required: false
+    fields:
+      - name: データモデル図
+        required: false
+        type: string
+      - name: テーブル定義
+        required: false
+        type: list
+  - name: 運用・保守
+    required: false
+    fields:
+      - name: ログ・監視
+        required: false
+        type: string
+      - name: 障害対応
+        required: false
+        type: string
+      - name: バックアップ
+        required: false
+        type: string
+  - name: 変更履歴
+    required: false
+    fields:
+      - name: 履歴
+        required: false
+        type: list
