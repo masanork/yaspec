@@ -65,7 +65,30 @@ file_format_guidelines:
     validator_config: |
       # Add to the top of each spec file:
       # validator_path: spec_validator.yaml
-  
+    er_diagram:
+      description: |
+        For ER diagram (Entity-Relationship diagram) definitions, in addition to structured YAML notation,
+        it is also recommended to include Mermaid syntax as a string block within YAML when needed.
+        This enables direct visualization (rendering) of ER diagrams from the specification document.
+      mermaid_field_example: |
+        er_diagram_mermaid: |
+          ```mermaid
+          erDiagram
+              USER {
+                int id
+                string name
+                string email
+              }
+              ORDER {
+                int id
+                int user_id
+                decimal total
+              }
+              USER ||--o{ ORDER : "has orders"
+          ```
+      note: |
+        Mermaid blocks can be extracted and visualized using Markdown-compatible editors or tools.
+        By leveraging both YAML structure and Mermaid syntax, you can achieve both machine-readability and visual clarity in design documentation.
   naming_conventions:
     - "Use lowercase letters and hyphens"
     - "Be descriptive and consistent"
