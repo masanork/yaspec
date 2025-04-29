@@ -12,9 +12,6 @@ sections:
       - name: created_date
         required: true
         type: date
-      - name: updated_date
-        required: false
-        type: date
       - name: author
         required: true
         type: string
@@ -24,69 +21,18 @@ sections:
       - name: purpose
         required: true
         type: string
-      - name: target_users
-        required: false
-        type: string
-      - name: use_cases
-        required: false
-        type: string
-  - name: terminology
-    required: false
-    fields:
-      - name: terms
-        required: false
-        type: list
   - name: requirements
     required: true
     fields:
       - name: functional
         required: true
         type: list
-      - name: non_functional
-        required: false
-        type: list
-      - name: constraints
-        required: false
-        type: list
-  - name: ui_design
-    required: false
-    fields:
-      - name: flow_diagram
-        required: false
-        type: string
-      - name: screens
-        required: false
-        type: list
   - name: api_specification
-    required: false
+    required: true
     fields:
       - name: endpoints
         required: true
         type: list
-      - name: parameters
+      - name: response_examples
         required: true
-        type: list
-      - name: responses
-        required: true
-        type: list
-  - name: data_design
-    required: false
-    fields:
-      - name: model_diagram
-        required: false
-        type: string
-      - name: tables
-        required: false
-        type: list
-  - name: operations
-    required: false
-    fields:
-      - name: monitoring
-        required: false
-        type: list
-      - name: backup
-        required: false
-        type: list
-      - name: disaster_recovery
-        required: false
         type: list

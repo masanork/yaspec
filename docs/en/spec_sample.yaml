@@ -2,70 +2,22 @@
 # validator_path: spec_validator.yaml
 ---
 document_info:
-  title: "Sample System Specification"
+  title: "Sample App Spec"
   version: "1.0.0"
-  created_date: "2025-04-18"
-  updated_date: "2025-04-18"
-  author: "John Smith"
+  created_date: "2025-04-29"
+  author: "Your Name"
 
 overview:
-  purpose: "This system aims to automate internal business operations."
-  target_users: "General employees"
-  use_cases: "Daily operations efficiency improvement"
-
-terminology:
-  terms:
-    - API: "Abbreviation for Application Programming Interface"
-    - LLM: "Large Language Model"
+  purpose: "This app provides a minimal Windsurf demo."
 
 requirements:
   functional:
-    - User registration
-    - Login
-    - Data search
-  non_functional:
-    - Response time within 1 second
-    - SSL communication required
-  constraints:
-    - No external network connection allowed
-
-ui_design:
-  flow_diagram: "img/flow.png"
-  screens:
-    - Login screen
-    - Main screen
+    - User can register
+    - User can login
 
 api_specification:
   endpoints:
-    - GET /api/users
+    - POST /api/register
     - POST /api/login
-  parameters:
-    - /api/login: { user_id: string, password: string }
   response_examples:
-    - /api/users: [{ id: 1, name: "Smith" }]
-  responses:
-    - /api/users: { "200": "List of users", "404": "Not found" }
-    - /api/login: { "200": "Login success", "401": "Authentication failed" }
-  error_cases:
-    - /api/login: "Returns 401 on authentication failure"
-
-data_design:
-  model_diagram: "img/er.png"
-  tables:
-    - users_table: { id: int, name: string }
-
-operations:
-  monitoring:
-    - "Output info level logs"
-    - "Output error level logs"
-    - "Monitor system resources"
-  error_handling: "Email notification to admin on system failure"
-  backup:
-    - "Daily automatic backup at midnight"
-    - "Weekly full backup"
-    - "Monthly archive"
-
-change_history:
-  - version: "1.0.0"
-    date: "2025-04-18"
-    changes: "Initial version"
+    - /api/login: { "200": "Login success", "401": "Auth failed" }
